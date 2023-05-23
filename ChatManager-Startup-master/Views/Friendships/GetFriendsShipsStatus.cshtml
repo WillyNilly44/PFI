@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ChatManager.Models.User>
+@foreach (var item in Model)
+{
+    <div class="friendContainer">
+
+        <a href="mailto:@item.Email">
+            <div class="userItem">
+                @Helper.Image(item.GetAvatarURL(), "UserSmallAvatar")
+                <div class=" ellipsis">
+                    @item.LastName @item.FirstName
+                </div>
+            </div>
+
+        </a>
+        @Helper.OnLineStatusIcon(@ChatManager.Models.OnlineUsers.IsOnLine(item.Id))
+        @if (ChatManager.Models.DB.FriendShips.GetFriendShipType(ChatManager.Models.OnlineUsers.GetSessionUser().Id, item.Id) == null)
+        {
+            if (item.Blocked)
+            {
+                <span class="icon fa red fa-ban" title="@item.GetFullName() est banis."></span>
+            }
+            else
+            {
+                @Helper.IconCmd("Friendships", "SendFriendshipRequest/" + item.Id, "command icon fa green fa-plus-circle", "Envoyer une demande d'amitié à " + item.GetFullName())
+            }
+
+        }
+        else
+        {
+            @Helper.TypeAmis(ChatManager.Models.DB.FriendShips.GetFriendShipType(ChatManager.Models.OnlineUsers.GetSessionUser().Id, item.Id))
+        }
+
+
+    </div>
+}

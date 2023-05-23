@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ChatManager.Models.User>
+@{
+    if (Session["IdSelected"] == null)
+    {
+
+        Session["IdSelected"] = 0;
+    }
+}
+
+
+@foreach (var item in Model)
+{
+
+    if (item.Id == (int)Session["IdSelected"])
+    {
+        <div class="selectedTarget" userid="@item.Id" title="@item.GetFullName()">
+            @Helper.Image(item.GetAvatarURL(), "UserSmallAvatar")
+        </div>
+    }
+    else
+    {
+        <div class="unselectedTarget" userid="@item.Id" title="@item.GetFullName()">
+            @Helper.Image(item.GetAvatarURL(), "UserSmallAvatar")
+        </div>
+
+    }
+
+
+
+}

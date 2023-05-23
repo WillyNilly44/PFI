@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Conversations";
+}
+
+<h2>Conversations</h2>
+<hr />
+<div class="messagesPanel" id="messagesPanel" title="">
+
+</div>
+@section Scripts{
+    <script defer>
+        let messagesPanelUpdater = new PartialRefresh("/Chat/GetChatLogs", "messagesPanel", 5, UpdateMessagesCallback);
+        function UpdateMessagesCallback() {
+            $("#typing").hide();
+            $(".editMessage").hide();
+            $("#messagesPanel").scrollTop($("#messagesPanel")[0].scrollHeight + 100);
+
+            $(".contentImage").click(function (event) {
+                event.stopPropagation();
+            })
+            $("a").click(function (event) {
+                event.stopPropagation();
+            })
+            $(".sent").click(function () {
+                if (!editing) {
+                    setEditing(true);
+                    var message_id = $(this).attr("id").split("_")[1];
+                    $("#edit_" + message_id).show();
+                    $("#sent_" + message_id).hide();
+                    $("#delete_" + message_id).click(function () {
+                        setEditing(false);
+                        messagesPanelUpdater.confirmedCommand("Effacer ce message", "/Chat/Delete/" + message_id);
+                    })
+                    $("#update_" + message_id).click(function () {
+                        setEditing(false);
+                        var message = $("#" + message_id).val();
+                        messagesPanelUpdater.command("/Chat/Update?id=" + message_id + "&message=" + message);
+                    })
+                    $('#' + message_id).keypress(function (event) {
+                        var keycode = (event.keyCode ? event.keyCode : event.which);
+                        if (keycode == '13') {
+                            setEditing(false);
+                            var message = $("#" + message_id).val();
+                            messagesPanelUpdater.command("/Chat/Update?id=" + message_id + "&message=" + message);
+                        }
+                    });
+                    $(document).on('keyup', function (event) {
+                        if (event.key == "Escape") {
+                            $("#edit_" + message_id).hide();
+                            $("#sent_" + message_id).show();
+                            setEditing(false);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
